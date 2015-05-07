@@ -57,15 +57,67 @@
 
   <div class="wrapper">
     <div class="game-container">
-      <script>
+    <script>
+        "use strict";
+
         function getRandomInt(min, max) {
           return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
+        function getItemIndex(item) {
+          //item.parentNode.childNodes.indexOf(item)
+          return items.indexOf(item)
+        }
+
+        function getItemAtIndex(i) {
+          //document.querySelector('game-container').childNodes[i]
+          return items[i]
+        }
+
+        function getItemColor(item) {
+          return item.className.split(' ')[1]
+        }
+
+        function getSiblings(item) {
+          var index = getItemIndex(item)
+          var siblings = [
+            (index % 15 == 0) ? -1 : (index - 1),
+            index - 15,
+            ((index + 1) % 15 == 0) ? -1 : (index + 1),
+            index + 15
+          ].filter(function(i){ return i >= 0})
+           .map(function(i){ return getItemAtIndex(i) })
+          return siblings;
+        }
+
+        function changeColor(item, newColor) {
+          var className = item.className.split(' ')[0]
+          item.className = className + ' ' + newColor;
+        }
+
+        function update(item, newColor) {
+          var itemsToChange = []
+          update_(item, newColor, itemsToChange);
+          itemsToChange.forEach(function(item) {
+            changeColor(item, newColor)
+          })
+          document.body.className = newColor
+        }
+        function update_(item, newColor, itemsToChange) {
+          itemsToChange.push(item)
+          var currentColor = getItemColor(item)
+          var siblings = getSiblings(item);
+          var siblingsColors = siblings.map(getItemColor);
+          siblingsColors.forEach(function(c, i) {
+            if(c == currentColor && itemsToChange.indexOf(siblings[i]) == -1) {
+              update_(siblings[i], newColor, itemsToChange)
+            }
+          })
+        }
 
         var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet']
         for(var i=0; i<225; i++) {
-          k = getRandomInt(0, colors.length - 1)
+          var k = getRandomInt(0, colors.length - 1)
           document.write('<div class="item ' + colors[k] + '"></div>')
         }
       </script>
@@ -75,6 +127,24 @@
       <button class="btn btn-default pull-right"><i class="glyphicon glyphicon-repeat"></i></button>
     </div>
   </div>
+  <script>
+    setTimeout(function() {
+      items = Array.prototype.slice.call(document.querySelector('.game-container').childNodes)
+      // remove text nodes
+      items[0].parentNode.removeChild(items[0]); items.shift();
+      items[0].parentNode.removeChild(items[0]); items.shift();
+      items[items.length-1].parentNode.removeChild(items[items.length-1]); items.pop();
 
+      items.forEach(function(node) {
+        node.addEventListener('click', function() {
+          update(
+              items[0],
+              getItemColor(node)
+          )
+        })
+      })
+      console.log('READY!')
+    }, 2000)
+  </script>
 </body>
 </html>
