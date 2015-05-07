@@ -104,7 +104,7 @@ class FieldComponent extends React.Component {
     render() {
         var {cells, handleClick} = this.props;
         cells = _(cells).map(function(k, i) {
-            return <div className={`item ${colors[k]}`} onClick={handleClick.bind(undefined, i)}></div>
+            return <div key={i}className={`item ${colors[k]}`} onClick={handleClick.bind(undefined, i)}></div>
         })
         return (
             <div className="game-container clearfix">
@@ -145,12 +145,12 @@ class AppComponent extends React.Component {
       var {state, props} = this;
       var handleClick = props.store.handleClick.bind(props.store);
       return (
-          <div className={`main-container ${state.currentColor}`}>
-              <div className={"wrapper"}>
-                  <FieldComponent cells={state.cells} handleClick={handleClick}/>
-                  <ControlsComponent/>
-              </div>
+        <div className={`main-container ${colors[state.currentColor]}`}>
+          <div className={"wrapper"}>
+            <FieldComponent cells={state.cells} handleClick={handleClick}/>
+            <ControlsComponent/>
           </div>
+        </div>
       )
   }
 }
