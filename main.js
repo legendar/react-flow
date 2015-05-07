@@ -51,8 +51,8 @@ class Storage extends EventEmitter {
 class FieldComponent extends React.Component {
     render() {
         var {cells} = this.props;
-        cells = _(cells).map(function(k) {
-            return <div className={`item ${colors[k]}`}></div>
+        cells = _(cells).map(function(k, i) {
+            return <div key={i} className={`item ${colors[k]}`}></div>
         })
         return (
             <div className="game-container clearfix">
@@ -80,7 +80,6 @@ class AppComponent extends React.Component {
     this.state = props.store.getState()
   }
   componentDidMount() {
-    debugger
     this.props.store.addListener('change', this._onChange.bind(this));
   }
   componentWillUnmount() {
