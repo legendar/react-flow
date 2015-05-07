@@ -2,7 +2,9 @@ var React = require('react/addons'),
     _ = require('underscore'),
     IM = require('immutable'),
     debug = require('debug'),
-    log = debug('main');
+    log = debug('main'),
+    EventEmitter = require('events').EventEmitter;
+    
 window.myDebug = debug;
 
 var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
@@ -11,10 +13,40 @@ function getRandomInt(min, max) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-var cells = _(_.range(15 * 15)).map(
+class Storage extends EventEmitter {
+  refresh() { 
+    this.cells = _(_.range(15 * 15)).map(
       _.partial(getRandomInt, 0, colors.length-1)
-    ),
-    currentColor = cells[0];
+    );
+  }
+  getState() {
+    return {
+      cells: this.cells,
+      currentColor: this.getCurrentColor(),
+      turns: 15
+    };
+  }
+  constructor() {
+    super();
+    this.refresh();
+  }
+  getCurrentColor() {
+    return this.cells[0];
+  }
+  handleClick(i) {
+    var desiredColor = this.cells[i];
+    if(desiredColor === this.getCurrentColor) {
+      return;
+    }
+    refresh();
+    this.emitChange();
+  }
+  emitChange() {
+    this.emit('change');
+  }
+
+}
+
 
 class FieldComponent extends React.Component {
     render() {
@@ -43,21 +75,35 @@ class ControlsComponent extends React.Component {
 };
 
 class AppComponent extends React.Component {
-    render() {
-        var {props} = this;
-        log(props)
-        return (
-            <div className={`main-container ${props.currentColor}`}>
-                <div className={"wrapper"}>
-                    <FieldComponent cells={props.cells}/>
-                    <ControlsComponent/>
-                </div>
-            </div>
-        )
-    }
+  constructor(props) {
+    super(props)
+    this.state = props.store.getState()
+  }
+  componentDidMount() {
+    debugger
+    this.props.store.addListener('change', this._onChange.bind(this));
+  }
+  componentWillUnmount() {
+    this.props.store.removeListener('change', this._onChange.bind(this));
+  }
+  _onChange() {
+    var store = this.props;
+    this.setState(store.getState());
+  }
+  render() {
+      var {state} = this;
+      return (
+          <div className={`main-container ${state.currentColor}`}>
+              <div className={"wrapper"}>
+                  <FieldComponent cells={state.cells}/>
+                  <ControlsComponent/>
+              </div>
+          </div>
+      )
+  }
 }
 
 React.render(
-    <AppComponent cells={cells} currentColor={colors[currentColor]}/>,
+    <AppComponent store={new Storage()}/>,
     document.body
 );
