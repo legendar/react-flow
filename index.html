@@ -7,12 +7,18 @@
 
     <style>
 
+      html, body, .main-container {
+        padding: 0;
+        margin: 0;
+        height: 100%;
+      }
       body {
         text-align: center;
       }
 
       .wrapper {
-        margin: 20px auto;
+        margin: auto;
+        padding-top: 20px;
         width: 600px;
       }
 
@@ -52,10 +58,10 @@
 
     </style>
 </head>
-<body class="violet">
-
+<body>
+<div class="main-container violet">
   <div class="wrapper">
-    <div class="game-container">
+    <div class="game-container clearfix">
       <script>
         function getRandomInt(min, max) {
           return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -74,7 +80,7 @@
       <button class="btn btn-default pull-right"><i class="glyphicon glyphicon-repeat"></i></button>
     </div>
   </div>
-
-  <script src='static/bundle.js'></script>
+</div>
+<script src='static/bundle.js'></script>
 </body>
 </html>
