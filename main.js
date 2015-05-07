@@ -16,6 +16,50 @@ var cells = _(_.range(15 * 15)).map(
     ),
     currentColor = cells[0];
 
+function isValidIndex(i) {
+  return i >=0 && i < 15*15;
+}
+
+function getSiblings(index) {
+  siblings = [
+    // left
+    (index % 15 == 0) ? -1 : (index - 1),
+    // top
+    index - 15,
+    // right
+    ((index + 1) % 15 == 0) ? -1 : (index + 1),
+    // bottom
+    index + 15
+  ]
+  return siblings.filter(isValidIndex)
+}
+
+function getItemColor(index) {
+  return cells[index];
+}
+
+function updateItem(index, newColor) {
+  cells[index] = newColor
+}
+
+function updateCells(newColor) {
+  getItemsToUpdate(0, newColor, itemsToUpdate = []);
+  itemsToUpdate.forEach((index)=> updateItem(index, newColor))
+  // TODO update background here
+}
+
+function determineItemsToUpdate(index, newColor, itemsToUpdate) {
+  itemsToUpdate.push(index)
+  var currentColor = getItemColor(index)
+  var siblings = getSiblings(index);
+  var siblingsColors = siblings.map(getItemColor);
+  siblingsColors.forEach(function(color, i) {
+    if(color == currentColor && itemsToUpdate.indexOf(siblings[i]) == -1) {
+      determineItemsToUpdate(siblings[i], newColor, itemsToUpdate)
+    }
+  })
+}
+
 class FieldComponent extends React.Component {
     render() {
         var {cells} = this.props;
