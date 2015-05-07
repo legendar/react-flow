@@ -31,11 +31,15 @@ class Storage extends EventEmitter {
     super();
     this.refresh();
 
-    this.handleClick = this.handleClick.bind(this)
-    this.handleRefresh = this.handleRefresh.bind(this)
-    this.isValidIndex = this.isValidIndex.bind(this)
-    this.getItemColor = this.getItemColor.bind(this)
+    var methods = [
+      'handleRefresh', 'handleClick', 'isValidIndex', 'getItemColor'
+    ];
+
+    methods.forEach((method)=>
+      this[methodName] = this[methodName].bind(this)
+    )
   }
+
   getCurrentColor() {
     return this.cells[0];
   }
@@ -54,6 +58,7 @@ class Storage extends EventEmitter {
     this.turns++;
     this.emitChange();
   }
+
   emitChange() {
     this.emit('change');
   }
@@ -88,7 +93,6 @@ class Storage extends EventEmitter {
     var itemsToUpdate = []
     this.determineItemsToUpdate(0, newColor, itemsToUpdate);
     itemsToUpdate.forEach((index)=> this.updateItem(index, newColor))
-    // TODO update background here
   }
 
   determineItemsToUpdate(index, newColor, itemsToUpdate) {
@@ -105,10 +109,6 @@ class Storage extends EventEmitter {
 }
 
 class FieldComponent extends React.Component {
-    handleClick(e) {
-      debugger
-    }
-
     render() {
         var {cells, handleClick} = this.props;
         cells = _(cells).map(function(k, i) {
@@ -120,7 +120,8 @@ class FieldComponent extends React.Component {
             </div>
         )
     }
-};
+}
+
 class ControlsComponent extends React.Component {
     render() {
       var {turns, handleRefresh} = this.props
@@ -133,7 +134,7 @@ class ControlsComponent extends React.Component {
         </div>
       )
     }
-};
+}
 
 class AppComponent extends React.Component {
   constructor(props) {
