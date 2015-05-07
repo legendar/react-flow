@@ -4,7 +4,7 @@ var React = require('react/addons'),
     debug = require('debug'),
     log = debug('main'),
     EventEmitter = require('events').EventEmitter;
-    
+
 window.myDebug = debug;
 
 var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet'];
@@ -18,32 +18,40 @@ class Storage extends EventEmitter {
     this.cells = _(_.range(15 * 15)).map(
       _.partial(getRandomInt, 0, colors.length-1)
     );
+    this.turns = 0;
   }
   getState() {
     return {
       cells: this.cells,
       currentColor: this.getCurrentColor(),
-      turns: 15
+      turns: this.turns
     };
   }
   constructor() {
     super();
     this.refresh();
 
-
     this.handleClick = this.handleClick.bind(this)
+    this.handleRefresh = this.handleRefresh.bind(this)
     this.isValidIndex = this.isValidIndex.bind(this)
     this.getItemColor = this.getItemColor.bind(this)
   }
   getCurrentColor() {
     return this.cells[0];
   }
+
+  handleRefresh() {
+    this.refresh()
+    this.emitChange();
+  }
+
   handleClick(i) {
     var desiredColor = this.cells[i];
     if(desiredColor === this.getCurrentColor()) {
       return;
     }
     this.updateCells(desiredColor)
+    this.turns++;
     this.emitChange();
   }
   emitChange() {
@@ -104,7 +112,7 @@ class FieldComponent extends React.Component {
     render() {
         var {cells, handleClick} = this.props;
         cells = _(cells).map(function(k, i) {
-            return <div className={`item ${colors[k]}`} onClick={handleClick.bind(undefined, i)}></div>
+            return <div key={i} className={`item ${colors[k]}`} onClick={handleClick.bind(undefined, i)}></div>
         })
         return (
             <div className="game-container clearfix">
@@ -115,14 +123,15 @@ class FieldComponent extends React.Component {
 };
 class ControlsComponent extends React.Component {
     render() {
-        return (
-            <div className="controls clearfix">
-              <span className="counter">201</span>
-              <button className="btn btn-default pull-right">
-                <i className="glyphicon glyphicon-repeat"></i>
-              </button>
-            </div>
-        )
+      var {turns, handleRefresh} = this.props
+      return (
+        <div className="controls clearfix">
+          <span className="counter">{turns}</span>
+          <button className="btn btn-default pull-right" onClick={handleRefresh}>
+            <i className="glyphicon glyphicon-repeat"></i>
+          </button>
+        </div>
+      )
     }
 };
 
@@ -143,12 +152,12 @@ class AppComponent extends React.Component {
   }
   render() {
       var {state, props} = this;
-      var handleClick = props.store.handleClick.bind(props.store);
+      var {handleClick, handleRefresh, turns} = props.store;
       return (
-          <div className={`main-container ${state.currentColor}`}>
+          <div className={`main-container ${colors[state.currentColor]}`}>
               <div className={"wrapper"}>
                   <FieldComponent cells={state.cells} handleClick={handleClick}/>
-                  <ControlsComponent/>
+                  <ControlsComponent handleRefresh={handleRefresh} turns={turns}  />
               </div>
           </div>
       )
