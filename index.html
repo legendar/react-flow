@@ -59,28 +59,6 @@
     </style>
 </head>
 <body>
-<div class="main-container violet">
-  <div class="wrapper">
-    <div class="game-container clearfix">
-      <script>
-        function getRandomInt(min, max) {
-          return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
-
-
-        var colors = ['red', 'orange', 'yellow', 'green', 'blue', 'violet']
-        for(var i=0; i<225; i++) {
-          k = getRandomInt(0, colors.length - 1)
-          document.write('<div class="item ' + colors[k] + '"></div>')
-        }
-      </script>
-    </div>
-    <div class="controls">
-      <span class="counter">201</span>
-      <button class="btn btn-default pull-right"><i class="glyphicon glyphicon-repeat"></i></button>
-    </div>
-  </div>
-</div>
 <script src='static/bundle.js'></script>
 </body>
 </html>
