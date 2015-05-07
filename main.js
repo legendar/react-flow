@@ -32,7 +32,7 @@ class FieldComponent extends React.Component {
 class ControlsComponent extends React.Component {
     render() {
         return (
-            <div className="controls">
+            <div className="controls clearfix">
               <span className="counter">201</span>
               <button className="btn btn-default pull-right">
                 <i className="glyphicon glyphicon-repeat"></i>
