@@ -35,7 +35,7 @@ class Storage extends EventEmitter {
       'handleRefresh', 'handleClick', 'isValidIndex', 'getItemColor'
     ];
 
-    methods.forEach((method)=>
+    methods.forEach((methodName)=>
       this[methodName] = this[methodName].bind(this)
     )
   }
